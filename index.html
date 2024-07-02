@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat with AI</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 50px;
+    }
+    #chat-container {
+      width: 840px;
+      border: 1px solid #ccc;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    #messages {
+      height: 500px;
+      overflow-y: auto;
+      border-bottom: 1px solid #ccc;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+    }
+    .message {
+      margin: 10px 0;
+    }
+    .user {
+      font-weight: bold;
+    }
+    .response {
+      margin-left: 20px;
+      color: blue;
+    }
+  </style>
+</head>
+<body>
+<div id="chat-container">
+  <div id="messages"></div>
+  <input type="text" id="user-input" placeholder="Type your message here..." style="width: 80%;">
+  <button onclick="sendMessage()">Send</button>
+</div>
+<script>
+  async function sendMessage() {
+    const userInput = document.getElementById('user-input').value;
+    if (!userInput) {
+      alert("Please enter a message");
+      return;
+    }
+
+    const messageContainer = document.getElementById('messages');
+    const userMessage = document.createElement('div');
+    userMessage.className = 'message user';
+    userMessage.innerText = 'You: ' + userInput;
+    messageContainer.appendChild(userMessage);
+
+    const response = await fetch('http://localhost:5000/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ message: userInput })
+    });
+
+    const data = await response.json();
+    const botMessage = document.createElement('div');
+    botMessage.className = 'message response';
+    botMessage.innerText = 'AI: ' + data.response;
+    messageContainer.appendChild(botMessage);
+
+    document.getElementById('user-input').value = '';
+    messageContainer.scrollTop = messageContainer.scrollHeight;
+  }
+</script>
+</body>
+</html>
